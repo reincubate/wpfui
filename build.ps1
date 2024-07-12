@@ -30,6 +30,7 @@ if ($dotnetVersion -eq $null) {
 
 if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") {
     dotnet restore Wpf.Ui.sln /tl
+    dotnet build src\Wpf.Ui\Wpf.Ui.csproj --configuration Release --no-restore -p:SourceLinkEnabled=true
     dotnet build src\Wpf.Ui.Gallery\Wpf.Ui.Gallery.csproj --configuration Release --no-restore --verbosity quiet /tl
 } else {
     Write-Host "Not in the x64 desktop environment."
