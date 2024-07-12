@@ -6,7 +6,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Wpf.Ui</RootNamespace>
     <AssemblyName>Wpf.Ui</AssemblyName>
-    <PackageId>WPF-UI</PackageId>
+    <PackageId>Reincubate.WPF-UI</PackageId>
     <Product>WPF UI</Product>
     <Title>WPF UI</Title>
     <NeutralLanguage>en-US</NeutralLanguage>
