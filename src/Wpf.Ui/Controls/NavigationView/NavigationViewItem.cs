@@ -11,7 +11,6 @@ using System.Collections.Specialized;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Wpf.Ui.Controls.NavigationView;
 
 // ReSharper disable once CheckNamespace
 namespace Wpf.Ui.Controls;
