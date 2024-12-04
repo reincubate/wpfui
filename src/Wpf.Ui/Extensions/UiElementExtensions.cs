@@ -9,6 +9,7 @@ internal static class UiElementExtensions
 {
     /// <summary>
     /// Do not call it outside of NCHITTEST, NCLBUTTONUP, NCLBUTTONDOWN messages!
+    /// Uses just bounds checking.
     /// </summary>
     /// <returns><see langword="true"/> if mouse is over the element. <see langword="false"/> otherwise.</returns>
     public static bool IsMouseOverElement(this UIElement element, IntPtr lParam)
@@ -27,6 +28,33 @@ internal static class UiElementExtensions
             Point mousePosRelative = element.PointFromScreen(mousePosScreen);
 
             return bounds.Contains(mousePosRelative);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Tests if the mouse screen position is over a <see cref="Visual"/>.
+    /// Uses <see cref="VisualTreeHelper"/>.
+    /// </summary>
+    /// <param name="visual">The visual to test</param>
+    /// <param name="lParam">lparam coming from NCHITTEST, NCLBUTTONUP, NCLBUTTONDOWN messages</param>
+    /// <returns><see langword="true"/> if mouse is over the element. <see langword="false"/> otherwise.</returns>
+    public static bool IsMouseOverVisual(this Visual visual, IntPtr lParam)
+    {
+        if (lParam == IntPtr.Zero)
+        {
+            return false;
+        }
+
+        try
+        {
+            Point mousePosScreen = new(Get_X_LParam(lParam), Get_Y_LParam(lParam));
+            Point relativePos = visual.PointFromScreen(mousePosScreen);
+            HitTestResult hitResult = VisualTreeHelper.HitTest(visual, relativePos);
+            return hitResult != null;
         }
         catch
         {

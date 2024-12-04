@@ -4,7 +4,9 @@
 // All Rights Reserved.
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Windows.Shapes;
 using Wpf.Ui.Designer;
 using Wpf.Ui.Extensions;
 using Wpf.Ui.Input;
@@ -193,6 +195,21 @@ public class TitleBar : System.Windows.Controls.Control, IThemeControl
         new PropertyMetadata(null)
     );
 
+    /// <summary> Identifies the <see cref="DragArea"/> dependency property. /// </summary>
+    public static readonly DependencyProperty DragAreaProperty = DependencyProperty.Register(
+        nameof(DragArea),
+        typeof(Rectangle),
+        typeof(TitleBar),
+        new PropertyMetadata(null));
+
+
+    /// <summary> Identifies the <see cref="TopContent"/> dependency property. /// </summary>
+    public static readonly DependencyProperty TopContentProperty = DependencyProperty.Register(
+          nameof(TopContent),
+          typeof(UIElement),
+          typeof(TitleBar),
+          new PropertyMetadata(null));
+
     /// <inheritdoc />
     public Appearance.ApplicationTheme ApplicationTheme
     {
@@ -371,6 +388,26 @@ public class TitleBar : System.Windows.Controls.Control, IThemeControl
     /// Gets or sets what <see cref="Action"/> should be executed when the Minimize button is clicked.
     /// </summary>
     public Action<TitleBar, System.Windows.Window>? MinimizeActionOverride { get; set; }
+
+    /// <summary>
+    /// Gets or sets the area that will override the current title bar size and location.
+    /// If this value is null, the titlebar dimensions and location will be used.
+    /// </summary>
+    public Rectangle? DragArea
+    {
+        get { return (Rectangle?)GetValue(DragAreaProperty); }
+        set { SetValue(DragAreaProperty, value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the content that should be considered "on top" of the draggable area. This content should not be identified
+    /// and hit tested as "the titlebar" so we can allow normal interaction.
+    /// </summary>
+    public UIElement? TopContent
+    {
+        get { return (UIElement?)GetValue(TopContentProperty); }
+        set { SetValue(TopContentProperty, value); }
+    }
 
     private readonly TitleBarButton[] _buttons = new TitleBarButton[4];
     private System.Windows.Window _currentWindow = null!;
@@ -629,12 +666,34 @@ public class TitleBar : System.Windows.Controls.Control, IThemeControl
                 // Ideally, clicking on the icon should open the system menu, but when the system menu is opened manually, double-clicking on the icon does not close the window
                 handled = true;
                 return (IntPtr)User32.WM_NCHITTEST.HTSYSMENU;
-            case User32.WM.NCHITTEST when this.IsMouseOverElement(lParam) && !isMouseOverHeaderContent:
+            case User32.WM.NCHITTEST when IsDraggable(lParam) && !isMouseOverHeaderContent:
                 handled = true;
                 return (IntPtr)User32.WM_NCHITTEST.HTCAPTION;
             default:
                 return IntPtr.Zero;
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool IsDraggable(IntPtr lParam)
+    {
+        UIElement dragTarget = this;
+        if (DragArea != null)
+        {
+            dragTarget = DragArea;
+        }
+
+        if (dragTarget.IsMouseOverElement(lParam))
+        {
+            if (TopContent?.IsMouseOverVisual(lParam) ?? false)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
