@@ -203,9 +203,9 @@ public class TitleBar : System.Windows.Controls.Control, IThemeControl
         new PropertyMetadata(null));
 
 
-    /// <summary> Identifies the <see cref="TopContent"/> dependency property. /// </summary>
-    public static readonly DependencyProperty TopContentProperty = DependencyProperty.Register(
-          nameof(TopContent),
+    /// <summary> Identifies the <see cref="ContentMask"/> dependency property. /// </summary>
+    public static readonly DependencyProperty ContentMaskProperty = DependencyProperty.Register(
+          nameof(ContentMask),
           typeof(UIElement),
           typeof(TitleBar),
           new PropertyMetadata(null));
@@ -403,10 +403,10 @@ public class TitleBar : System.Windows.Controls.Control, IThemeControl
     /// Gets or sets the content that should be considered "on top" of the draggable area. This content should not be identified
     /// and hit tested as "the titlebar" so we can allow normal interaction.
     /// </summary>
-    public UIElement? TopContent
+    public UIElement? ContentMask
     {
-        get { return (UIElement?)GetValue(TopContentProperty); }
-        set { SetValue(TopContentProperty, value); }
+        get { return (UIElement?)GetValue(ContentMaskProperty); }
+        set { SetValue(ContentMaskProperty, value); }
     }
 
     private readonly TitleBarButton[] _buttons = new TitleBarButton[4];
@@ -685,7 +685,7 @@ public class TitleBar : System.Windows.Controls.Control, IThemeControl
 
         if (dragTarget.IsMouseOverElement(lParam))
         {
-            if (TopContent?.IsMouseOverVisual(lParam) ?? false)
+            if (ContentMask?.IsMouseOverVisual(lParam) ?? false)
             {
                 return false;
             }
