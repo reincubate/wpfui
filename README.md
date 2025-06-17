@@ -3,10 +3,10 @@
 
 # WPF UI
 
-[Created with ❤ in Poland by lepo.co](https://lepo.co/)  
+[Created with ❤ in Poland by lepo.co](https://lepo.co/) and [wonderful open-source community](https://github.com/lepoco/wpfui/graphs/contributors)  
 WPF UI provides the Fluent experience in your known and loved WPF framework. Intuitive design, themes, navigation and new immersive controls. All natively and effortlessly. Library changes the base elements like `Page`, `ToggleButton` or `List`, and also includes additional controls like `Navigation`, `NumberBox`, `Dialog` or `Snackbar`.
 
-[![Discord](https://img.shields.io/discord/1071051348348514375?label=discord)](https://discord.gg/AR9ywDUwGq) [![GitHub license](https://img.shields.io/github/license/lepoco/wpfui)](https://github.com/lepoco/wpfui/blob/master/LICENSE) [![Nuget](https://img.shields.io/nuget/v/WPF-UI)](https://www.nuget.org/packages/WPF-UI/) [![Nuget](https://img.shields.io/nuget/dt/WPF-UI?label=nuget)](https://www.nuget.org/packages/WPF-UI/) [![VS 2022 Downloads](https://img.shields.io/visual-studio-marketplace/i/lepo.WPF-UI?label=vs-2022)](https://marketplace.visualstudio.com/items?itemName=lepo.WPF-UI) [![Sponsors](https://img.shields.io/github/sponsors/lepoco)](https://github.com/sponsors/lepoco)
+[![Discord](https://img.shields.io/discord/1071051348348514375?label=discord)](https://discord.gg/AR9ywDUwGq) [![GitHub license](https://img.shields.io/github/license/lepoco/wpfui)](https://github.com/lepoco/wpfui/blob/master/LICENSE) [![Nuget](https://img.shields.io/nuget/v/WPF-UI)](https://www.nuget.org/packages/WPF-UI/) [![Nuget](https://img.shields.io/nuget/dt/WPF-UI?label=nuget)](https://www.nuget.org/packages/WPF-UI/)
 
 ![ua](https://user-images.githubusercontent.com/13592821/184498735-d296feb8-0f9b-45df-bc0d-b7f0b6f580ed.png)
 
@@ -29,7 +29,7 @@ Support the development of WPF UI and other innovative projects by becoming a sp
 [Sponsor WPF UI on GitHub](https://github.com/sponsors/lepoco)
 
 ## 🚀 Getting started
-ąś
+
 For a starter guide see our [documentation](https://wpfui.lepo.co/documentation/).
 
 **WPF UI Gallery** is a free application available in the _Microsoft Store_, with which you can test all functionalities.  
@@ -68,7 +68,7 @@ https://marketplace.visualstudio.com/items?itemName=lepo.wpf-ui
 
 ## 📖 Documentation
 
-Documentation can be found at https://wpfui.lepo.co/. We also have a [tutorial](https://wpfui.lepo.co/tutorial/) over there for newcomers.
+Documentation can be found at https://wpfui.lepo.co/. We also have a [tutorial](#-getting-started) over there for newcomers.
 
 ## 🚧 Development
 
