@@ -253,10 +253,12 @@ public class MessageBox : System.Windows.Window
     /// </summary>
     public IRelayCommand TemplateButtonCommand => (IRelayCommand)GetValue(TemplateButtonCommandProperty);
 
+#if !NET8_0_OR_GREATER
     private static readonly PropertyInfo CanCenterOverWPFOwnerPropertyInfo = typeof(Window).GetProperty(
         "CanCenterOverWPFOwner",
         BindingFlags.NonPublic | BindingFlags.Instance
     )!;
+#endif
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MessageBox"/> class.
@@ -352,10 +354,7 @@ public class MessageBox : System.Windows.Window
                 CenterWindowOnScreen();
                 break;
             case WindowStartupLocation.CenterOwner:
-                if (
-                    !CanCenterOverWPFOwner()
-                    || Owner.WindowState is WindowState.Maximized or WindowState.Minimized
-                )
+                if (!CanCenterOverWPFOwner() || Owner.WindowState is WindowState.Minimized)
                 {
                     CenterWindowOnScreen();
                 }
@@ -443,7 +442,7 @@ public class MessageBox : System.Windows.Window
         {
             MessageBoxButton.Primary => MessageBoxResult.Primary,
             MessageBoxButton.Secondary => MessageBoxResult.Secondary,
-            _ => MessageBoxResult.None
+            _ => MessageBoxResult.None,
         };
 
         _ = Tcs?.TrySetResult(result);

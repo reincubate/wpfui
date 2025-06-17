@@ -110,6 +110,7 @@ public class FontIcon : IconElement
 
     protected TextBlock? TextBlock { get; set; }
 
+
     protected override UIElement InitializeChildren()
     {
         if (FontSize.Equals(SystemFonts.MessageFontSize))
