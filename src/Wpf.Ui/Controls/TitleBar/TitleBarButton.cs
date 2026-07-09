@@ -5,6 +5,7 @@
 
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
+using System.Windows.Input;
 using Windows.Win32;
 
 // ReSharper disable once CheckNamespace
@@ -91,6 +92,13 @@ public class TitleBarButton : Wpf.Ui.Controls.Button
 
     private bool _isClickedDown;
 
+    // True while a WPF (WISP) touch is down on this button. OnTouchDown fires before the touch-promoted
+    // non-client WM_NCLBUTTONUP reaches ReactToHwndHook and OnTouchUp fires after it, so this is reliably set
+    // exactly when the hook processes a touch tap - letting it tell a touch (which WPF also turns into a click)
+    // apart from a genuine mouse click. Only ever touched on the UI thread (WPF touch events and the hwnd hook
+    // both run there), so it needs no synchronization.
+    private bool _touchInProgress;
+
     public TitleBarButton()
     {
         Loaded += TitleBarButton_Loaded;
@@ -172,6 +180,34 @@ public class TitleBarButton : Wpf.Ui.Controls.Button
         _isClickedDown = false;
     }
 
+    // See _touchInProgress: track whether a WISP touch is currently down on this button so ReactToHwndHook can
+    // suppress its synthetic click for touch (WPF delivers that click itself, so the hook's would be a duplicate).
+    protected override void OnTouchDown(TouchEventArgs e)
+    {
+        _touchInProgress = true;
+        base.OnTouchDown(e);
+    }
+
+    protected override void OnTouchUp(TouchEventArgs e)
+    {
+        _touchInProgress = false;
+        base.OnTouchUp(e);
+    }
+
+    // Also clear if the touch never delivers an Up (finger dragged off the button, capture lost) so a later
+    // mouse click on this button is not mistaken for a touch.
+    protected override void OnTouchLeave(TouchEventArgs e)
+    {
+        _touchInProgress = false;
+        base.OnTouchLeave(e);
+    }
+
+    protected override void OnLostTouchCapture(TouchEventArgs e)
+    {
+        _touchInProgress = false;
+        base.OnLostTouchCapture(e);
+    }
+
     internal bool ReactToHwndHook(uint msg, IntPtr lParam, out IntPtr returnIntPtr)
     {
         returnIntPtr = IntPtr.Zero;
@@ -196,7 +232,15 @@ public class TitleBarButton : Wpf.Ui.Controls.Button
                 _isClickedDown = true;
                 return true;
             case PInvoke.WM_NCLBUTTONUP when _isClickedDown && this.IsMouseOverElement(lParam): // Left button clicked up
-                InvokeClick();
+                _isClickedDown = false;
+
+                // A touch tap is ALSO delivered by WPF's WISP stack as a promoted mouse click. Calling InvokeClick
+                // would then result in a doubled activation, e.g. maximizing & instantly restoring the window.
+                if (!_touchInProgress)
+                {
+                    InvokeClick();
+                }
+
                 return true;
             default:
                 return false;
