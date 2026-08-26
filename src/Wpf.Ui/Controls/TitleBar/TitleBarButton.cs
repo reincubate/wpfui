@@ -99,6 +99,12 @@ public class TitleBarButton : Wpf.Ui.Controls.Button
     // both run there), so it needs no synchronization.
     private bool _touchInProgress;
 
+    // True while a WPF (WISP) pen/stylus contact is down on this button. A pen tap does NOT raise WPF Touch
+    // events (it comes through the Stylus stack), so _touchInProgress never catches it and the NC hook fires a
+    // duplicate click - the same double-toggle as sc-54268, but for the pen (sc-56373). Stylus events also fire
+    // for finger touch, which is harmless: the finger case stays guarded by _touchInProgress. UI thread only.
+    private bool _stylusInProgress;
+
     public TitleBarButton()
     {
         Loaded += TitleBarButton_Loaded;
@@ -208,6 +214,33 @@ public class TitleBarButton : Wpf.Ui.Controls.Button
         base.OnLostTouchCapture(e);
     }
 
+    // See _stylusInProgress: mirror the touch tracking for pen/stylus, which WPF Touch events don't cover.
+    protected override void OnStylusDown(StylusDownEventArgs e)
+    {
+        _stylusInProgress = true;
+        base.OnStylusDown(e);
+    }
+
+    protected override void OnStylusUp(StylusEventArgs e)
+    {
+        _stylusInProgress = false;
+        base.OnStylusUp(e);
+    }
+
+    // Also clear if the stylus never delivers an Up (dragged off the button, capture lost) so a later mouse
+    // click on this button is not mistaken for a pen tap.
+    protected override void OnStylusLeave(StylusEventArgs e)
+    {
+        _stylusInProgress = false;
+        base.OnStylusLeave(e);
+    }
+
+    protected override void OnLostStylusCapture(StylusEventArgs e)
+    {
+        _stylusInProgress = false;
+        base.OnLostStylusCapture(e);
+    }
+
     internal bool ReactToHwndHook(uint msg, IntPtr lParam, out IntPtr returnIntPtr)
     {
         returnIntPtr = IntPtr.Zero;
@@ -234,9 +267,10 @@ public class TitleBarButton : Wpf.Ui.Controls.Button
             case PInvoke.WM_NCLBUTTONUP when _isClickedDown && this.IsMouseOverElement(lParam): // Left button clicked up
                 _isClickedDown = false;
 
-                // A touch tap is ALSO delivered by WPF's WISP stack as a promoted mouse click. Calling InvokeClick
-                // would then result in a doubled activation, e.g. maximizing & instantly restoring the window.
-                if (!_touchInProgress)
+                // A touch or pen tap is ALSO delivered by WPF's WISP stack as a promoted mouse click. Calling
+                // InvokeClick would then result in a doubled activation, e.g. maximizing & instantly restoring the
+                // window. Touch is caught by _touchInProgress; pen (which raises no Touch events) by _stylusInProgress.
+                if (!_touchInProgress && !_stylusInProgress)
                 {
                     InvokeClick();
                 }
